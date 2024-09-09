@@ -157,7 +157,7 @@ export function VideoQuoteCalculator() {
   }, [formData]);
 
   useEffect(() => {
-    if (step === 6) {
+    if (step === 7) {
       sendToZapier(formData);
     }
   }, [step]);
