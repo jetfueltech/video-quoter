@@ -13,6 +13,8 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { ChevronRight, ChevronLeft, Film, Clock, Clapperboard, Users, Camera, CheckCircle2, MapPin, AlertCircle, Star, Quote, ChevronDown, ChevronUp } from 'lucide-react';
 
+const ZAPIER_WEBHOOK_URL = '/api/sendtozapier'
+
 type DeliverableType = {
   duration: string;
   type: string;
@@ -154,6 +156,12 @@ export function VideoQuoteCalculator() {
     calculatePriceEstimate();
   }, [formData]);
 
+  useEffect(() => {
+    if (step === 6) {
+      sendToZapier(formData);
+    }
+  }, [step]);
+  
   const calculatePriceEstimate = () => {
     let basePrice = 0;
     let additionalCosts = 0;
@@ -266,9 +274,9 @@ export function VideoQuoteCalculator() {
     setStep(prevStep => prevStep - 1);
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
+    sendToZapier(formData);
     handleNext();
   };
 
@@ -329,6 +337,28 @@ export function VideoQuoteCalculator() {
       </div>
     </Card>
   );
+
+  const sendToZapier = async (data: FormDataType) => {
+    try {
+      const zapierData = {
+        ...data,
+        priceEstimate
+      }
+      console.log('zapierData submitted:', zapierData);
+      const response = await fetch(ZAPIER_WEBHOOK_URL, {
+        method: 'POST',
+        body: JSON.stringify(zapierData),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      if (!response.ok) {
+        throw new Error('Failed to send data to Zapier')
+      }
+    } catch (error) {
+      console.error('Error sending data to Zapier:', error)
+    }
+  }
 
   const renderStep = () => {
     switch (step) {
@@ -509,7 +539,8 @@ export function VideoQuoteCalculator() {
           </div>
         );
       case 6:
-        return formData.projectType !== 'event-video' ? (
+        return formData.projectType !== 'event-video' ? 
+        (
           <div className="space-y-6">
             <h2 className="text-2xl font-semibold text-gray-800">Pre-production Services</h2>
             <p className="text-gray-600">Select any pre-production services you need:</p>
