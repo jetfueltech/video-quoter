@@ -723,7 +723,7 @@ export function VideoQuoteCalculator() {
             <div className="space-y-4">
               <Input name="name" placeholder="Name" value={formData.quoteRequest.name} onChange={handleQuoteRequestChange} required />
               <Input name="email" type="email" placeholder="Email" value={formData.quoteRequest.email} onChange={handleQuoteRequestChange} required />
-              <Input name="phone" type="tel" placeholder="Phone" value={formData.quoteRequest.phone} onChange={handleQuoteRequestChange} required />
+              <Input name="phone" type="tel" placeholder="Phone(optional)" value={formData.quoteRequest.phone} onChange={handleQuoteRequestChange} />
               <Input name="company" placeholder="Company Name" value={formData.quoteRequest.company} onChange={handleQuoteRequestChange} />
               <Textarea name="additionalInfo" placeholder="Additional Information" value={formData.quoteRequest.additionalInfo} onChange={handleQuoteRequestChange} rows={3} />
             </div>
