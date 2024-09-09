@@ -630,10 +630,24 @@ export function VideoQuoteCalculator() {
                     <li key={addOn}>{addOn}</li>
                   ))}
                 </ul>
-                <div className="flex items-center justify-between mt-6">
+                <Separator />
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="flex items-center space-x-2">
+                      <h3 className="text-lg font-semibold">Estimated Price Range</h3>
+                    </div>
+                    <p className="text-2xl font-bold">${priceEstimate.min.toLocaleString()} - ${priceEstimate.max.toLocaleString()}</p>
+                  </div>
                   <Button onClick={handleNext} className="bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-300">
                     Start Project <ChevronRight className="ml-2 h-4 w-4" />
                   </Button>
+                </div>
+                <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mt-4" role="alert">
+                  <div className="flex items-center">
+                    <AlertCircle className="w-6 h-6 mr-2" />
+                    <p className="font-bold">Preliminary Quote Estimate</p>
+                  </div>
+                  <p className="mt-2">This is a preliminary quote estimate based on the information provided. For a final quote, please select &quot;Start Project&quot; to have our team review your project details and provide an accurate quote.</p>
                 </div>
               </div>
             </Card>
