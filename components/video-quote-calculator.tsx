@@ -113,21 +113,21 @@ const getProjectTypeDescription = (type: string) => {
 
 const testimonials = [
   {
-    name: "Sarah Johnson",
-    company: "TechInnovate Solutions",
-    text: "AUME Motion Arts transformed our complex product launch into a visually stunning narrative. Their attention to detail and creative approach exceeded our expectations. The video not only captured our product's essence but also resonated deeply with our target audience. A game-changer for our marketing strategy!",
+    name: "Valorie H.",
+    company: "Video Production",
+    text: "The video production they created for our leaders 25th Church Anniversary received a standing ovation!! The professionalism and continuous communication to make sure that the production was everything I envisioned for it to be. Truly 5 star in every aspect! Would definitely recommend them again and again!",
     rating: 5
   },
   {
-    name: "Michael Chen",
-    company: "GreenEarth Nonprofits",
-    text: "Working with AUME on our fundraising campaign video was an absolute pleasure. They have a unique ability to convey emotion and urgency through their work. The final product was so compelling that we saw a 40% increase in donations compared to previous years. Their professionalism and passion for storytelling truly sets them apart.",
+    name: "Franchesca S.",
+    company: "Marketing Videos",
+    text: "Micah and his team were all of the above: Responsive, punctual, professional, provided valuable information and feedback and provided quality work. They've helped our IT company establish a look and feel for other video projects we do and we would/will definitely work with them again in the future. Micah was very helpful and informative through the entire process.",
     rating: 5
   },
   {
-    name: "Emily Rodriguez",
-    company: "Culinary Creations Inc.",
-    text: "AUME Motion Arts brought our recipes to life in ways we never imagined. Their food videography is nothing short of art. They captured the essence of our brand while making every dish look irresistible. Since launching the video series, our cookbook sales have skyrocketed. They're not just videographers; they're culinary storytellers!",
+    name: "Lance K.",
+    company: "Testimonial Videos",
+    text: "It was great working with AUME for a video testimonial! The shots were of a high quality and Micah went above and beyond in terms of edits.",
     rating: 5
   }
 ];
