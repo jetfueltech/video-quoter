@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, FormEvent, ChangeEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -13,6 +13,31 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { ChevronRight, ChevronLeft, Film, Clock, Clapperboard, Users, Camera, CheckCircle2, MapPin, AlertCircle, Star, Quote, ChevronDown, ChevronUp } from 'lucide-react';
 
+type DeliverableType = {
+  duration: string;
+  type: string;
+};
+
+type FormDataType = {
+  projectType: string;
+  selectedGoals: string[];
+  projectDetails: string;
+  eventDays: number;
+  eventCity: string;
+  eventDeliverables: string[];
+  otherDeliverables: DeliverableType[];
+  addOns: string[];
+  preProductionServices: string[];
+  selectAllPreProduction: boolean;
+  quoteRequest: {
+    name: string;
+    email: string;
+    phone: string;
+    company: string;
+    additionalInfo: string;
+  };
+};
+
 const projectTypes = [
   { value: "event-video", label: "Event Video" },
   { value: "commercial", label: "Commercial" },
@@ -22,7 +47,7 @@ const projectTypes = [
   { value: "advertising", label: "Advertising" }
 ];
 
-const projectGoals = {
+const projectGoals: Record<string, string[]> = {
   "event-video": ["Document an Event", "Increase Brand Awareness", "Entertain Viewers", "Showcase Highlights", "Engage Attendees Post-Event", "Create Social Media Recap", "Capture Testimonials"],
   "commercial": ["Increase Brand Awareness", "Drive Sales", "Showcase Product/Service", "Create Social Media Engagement", "Educate About Brand", "Enhance Market Position", "Attract New Customers"],
   "corporate-interview": ["Educate About Company", "Showcase Leadership", "Internal Communication", "Share Industry Insights", "Build Trust", "Provide Updates", "Create Web/Social Content"],
@@ -31,12 +56,12 @@ const projectGoals = {
   "advertising": ["Increase Brand Awareness", "Drive Sales", "Engage on Social Media", "Promote Offers", "Entertain Viewers", "Highlight USP", "Build Customer Loyalty"]
 };
 
-const eventAddOns = {
+const eventAddOns: Record<string, number> = {
   "50 HQ Photography Shots": 500,
   "100 HQ Photography Shots": 750
 };
 
-const otherAddOns = {
+const otherAddOns: Record<string, number> = {
   "On-Screen Talent": 750,
   "Set Design": 1000,
   "Teleprompter": 350,
@@ -45,7 +70,7 @@ const otherAddOns = {
   "100 HQ Photography Shots": 750
 };
 
-const preProductionServices = {
+const preProductionServices: Record<string, number> = {
   "Scriptwriting": 200,
   "Storyboarding": 200,
   "Location Scouting": 200,
@@ -53,7 +78,7 @@ const preProductionServices = {
   "Props and Wardrobe": 200
 };
 
-const eventDeliverables = {
+const eventDeliverables: Record<string, number> = {
   "Event Stream": 1500,
   "Event Recording": 1250,
   "Event Recap Video": 1000,
@@ -62,7 +87,7 @@ const eventDeliverables = {
   "Social Media Promo": 600
 };
 
-const otherDeliverables = {
+const otherDeliverables: Record<string, number>= {
   "30 seconds": 1500,
   "60 seconds": 2250,
   "90 seconds": 3000,
@@ -72,7 +97,7 @@ const otherDeliverables = {
 
 const deliverableTypes = ["Commercial", "YouTube Video", "Social Media Ad", "Corporate Video", "Product Demo", "Training Video", "Testimonial", "Explainer Video", "Brand Video"];
 
-const getProjectTypeDescription = (type) => {
+const getProjectTypeDescription = (type: string) => {
   switch (type) {
     case "event-video": return "Capture and showcase live events";
     case "commercial": return "Promote products or services";
@@ -109,7 +134,7 @@ const companyBlurb = "We've worked with the likes of Chick-fil-A, Toyota, SMU, T
 
 export function VideoQuoteCalculator() {
   const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormDataType>({
     projectType: '',
     selectedGoals: [],
     projectDetails: '',
@@ -135,26 +160,30 @@ export function VideoQuoteCalculator() {
 
     if (formData.projectType === 'event-video') {
       basePrice = 3000 * formData.eventDays;
+      
       formData.eventDeliverables.forEach(deliverable => {
-        additionalCosts += eventDeliverables[deliverable];
+        if (deliverable && deliverable in eventDeliverables) {
+            additionalCosts += eventDeliverables[deliverable as keyof typeof eventDeliverables];
+        }
       });
     } else {
       basePrice = 3500;
+
       formData.otherDeliverables.forEach(deliverable => {
-        if (deliverable.duration) {
-          additionalCosts += otherDeliverables[deliverable.duration];
+        if (deliverable.duration && deliverable.duration in otherDeliverables) {
+            additionalCosts += otherDeliverables[deliverable.duration as keyof typeof otherDeliverables];
         }
       });
     }
 
-    formData.addOns.forEach(addOn => {
+    formData.addOns.forEach((addOn: string) => {
       additionalCosts += formData.projectType === 'event-video' ? eventAddOns[addOn] : otherAddOns[addOn];
     });
 
     if (formData.selectAllPreProduction) {
       additionalCosts += 750;
     } else {
-      formData.preProductionServices.forEach(service => {
+      formData.preProductionServices.forEach((service: string) => {
         additionalCosts += preProductionServices[service];
       });
     }
@@ -166,11 +195,11 @@ export function VideoQuoteCalculator() {
     setPriceEstimate({ min: minPrice, max: maxPrice });
   };
 
-  const handleInputChange = (field, value) => {
+  const handleInputChange = (field: string, value: DeliverableType[] | string | number) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleGoalChange = (goal) => {
+  const handleGoalChange = (goal: string) => {
     setFormData(prev => ({
       ...prev,
       selectedGoals: prev.selectedGoals.includes(goal)
@@ -179,7 +208,7 @@ export function VideoQuoteCalculator() {
     }));
   };
 
-  const handleDeliverableChange = (deliverable) => {
+  const handleDeliverableChange = (deliverable: string) => {
     setFormData(prev => ({
       ...prev,
       eventDeliverables: prev.eventDeliverables.includes(deliverable)
@@ -188,13 +217,13 @@ export function VideoQuoteCalculator() {
     }));
   };
 
-  const handleOtherDeliverableChange = (index, field, value) => {
+  const handleOtherDeliverableChange = (index: number, field: string, value: string) => {
     const newDeliverables = [...formData.otherDeliverables];
     newDeliverables[index] = { ...newDeliverables[index], [field]: value };
     handleInputChange('otherDeliverables', newDeliverables);
   };
 
-  const handleAddOnChange = (addOn) => {
+  const handleAddOnChange = (addOn: string) => {
     setFormData(prev => ({
       ...prev,
       addOns: prev.addOns.includes(addOn)
@@ -203,7 +232,7 @@ export function VideoQuoteCalculator() {
     }));
   };
 
-  const handlePreProductionServiceChange = (service) => {
+  const handlePreProductionServiceChange = (service: string) => {
     if (service === 'selectAll') {
       setFormData(prev => ({
         ...prev,
@@ -221,7 +250,7 @@ export function VideoQuoteCalculator() {
     }
   };
 
-  const handleQuoteRequestChange = (e) => {
+  const handleQuoteRequestChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -237,7 +266,7 @@ export function VideoQuoteCalculator() {
     setStep(prevStep => prevStep - 1);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log('Form submitted:', formData);
     handleNext();
@@ -289,7 +318,7 @@ export function VideoQuoteCalculator() {
                   ))}
                 </div>
               </div>
-              <p className="text-sm text-gray-600 italic">"{testimonial.text}"</p>
+              <p className="text-sm text-gray-600 italic">&quot;{testimonial.text}&quot;</p>
             </motion.div>
           ))}
         </AnimatePresence>
@@ -307,7 +336,7 @@ export function VideoQuoteCalculator() {
         return (
           <div className="space-y-6">
             <h2 className="text-2xl font-semibold text-gray-800">Select Your Project Type</h2>
-            <p className="text-gray-600">Choose the type of video project you're looking to create. This will help us tailor the quote to your specific needs.</p>
+            <p className="text-gray-600">Choose the type of video project you&apos;re looking to create. This will help us tailor the quote to your specific needs.</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {projectTypes.map((type) => (
                 <Button
@@ -329,7 +358,8 @@ export function VideoQuoteCalculator() {
             <h2 className="text-2xl font-semibold text-gray-800">Select Your Project Goals</h2>
             <p className="text-gray-600">Choose the primary goals for your {projectTypes.find(t => t.value === formData.projectType)?.label} project:</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {projectGoals[formData.projectType].map((goal) => (
+              {
+              projectGoals[formData.projectType].map((goal: string) => (
                 <div
                   key={goal}
                   className={`flex items-start space-x-2 bg-gray-50 p-3 rounded-lg cursor-pointer transition-colors ${
@@ -455,7 +485,7 @@ export function VideoQuoteCalculator() {
         return (
           <div className="space-y-6">
             <h2 className="text-2xl font-semibold text-gray-800">Add-Ons</h2>
-            <p className="text-gray-600">Select any additional services you'd like to include:</p>
+            <p className="text-gray-600">Select any additional services you&apos;d like to include:</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {Object.keys(formData.projectType === 'event-video' ? eventAddOns : otherAddOns).map((addOn) => (
                 <div
@@ -649,7 +679,7 @@ export function VideoQuoteCalculator() {
                     <AlertCircle className="w-6 h-6 mr-2" />
                     <p className="font-bold">Preliminary Quote Estimate</p>
                   </div>
-                  <p className="mt-2">This is a preliminary quote estimate based on the information provided. For a final quote, please select "Start Project" to have our team review your project details and provide an accurate quote.</p>
+                  <p className="mt-2">This is a preliminary quote estimate based on the information provided. For a final quote, please select &quot;Start Project&quot; to have our team review your project details and provide an accurate quote.</p>
                 </div>
               </div>
             </Card>
@@ -693,7 +723,7 @@ export function VideoQuoteCalculator() {
               <CheckCircle2 className="w-24 h-24 text-green-500 mx-auto" />
             </motion.div>
             <h2 className="text-3xl font-semibold text-gray-800">Thank You!</h2>
-            <p className="text-xl text-gray-600">Your quote request has been submitted successfully. We'll be in touch shortly with your personalized video production plan!</p>
+            <p className="text-xl text-gray-600">Your quote request has been submitted successfully. We&apos;ll be in touch shortly with your personalized video production plan!</p>
           </div>
         );
       case 9:
@@ -707,7 +737,7 @@ export function VideoQuoteCalculator() {
               <CheckCircle2 className="w-24 h-24 text-green-500 mx-auto" />
             </motion.div>
             <h2 className="text-3xl font-semibold text-gray-800">Thank You!</h2>
-            <p className="text-xl text-gray-600">Your quote request has been submitted successfully. We'll be in touch shortly with your personalized video production plan!</p>
+            <p className="text-xl text-gray-600">Your quote request has been submitted successfully. We&apos;ll be in touch shortly with your personalized video production plan!</p>
           </div>
         );
       default:
