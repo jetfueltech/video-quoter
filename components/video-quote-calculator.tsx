@@ -157,7 +157,9 @@ export function VideoQuoteCalculator() {
   }, [formData]);
 
   useEffect(() => {
-    if (step === 7) {
+    if (step === 7 && formData.projectType !== 'event-video') {
+      sendToZapier(formData);
+    } else if (step === 6 && formData.projectType === 'event-video') {
       sendToZapier(formData);
     }
   }, [step]);
