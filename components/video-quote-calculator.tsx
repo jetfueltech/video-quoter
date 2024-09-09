@@ -557,7 +557,7 @@ export function VideoQuoteCalculator() {
                   onCheckedChange={() => handlePreProductionServiceChange('selectAll')}
                 />
                 <div className="flex-grow">
-                  <Label htmlFor="selectAll" className="font-medium">Select All ($750)</Label>
+                  <Label htmlFor="selectAll" className="font-medium">Select All</Label>
                 </div>
               </div>
               {Object.keys(preProductionServices).map((service) => (
@@ -575,7 +575,7 @@ export function VideoQuoteCalculator() {
                     disabled={formData.selectAllPreProduction}
                   />
                   <div className="flex-grow">
-                    <Label htmlFor={service} className="font-medium">{service} ($200)</Label>
+                    <Label htmlFor={service} className="font-medium">{service}</Label>
                   </div>
                 </div>
               ))}
