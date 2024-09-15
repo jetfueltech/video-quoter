@@ -10,7 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { ChevronRight, Film, Clock, Clapperboard, Users, Camera, CheckCircle2, MapPin, AlertCircle, Star, Quote, ChevronDown, ChevronUp } from 'lucide-react';
+import { Film, Clock, Clapperboard, Users, Camera, CheckCircle2, MapPin, AlertCircle, Star, Quote, ChevronDown, ChevronUp } from 'lucide-react';
 
 const ZAPIER_WEBHOOK_URL = '/api/sendtozapier'
 
@@ -168,7 +168,6 @@ export function VideoQuoteCalculator() {
   const [expandedTestimonials, setExpandedTestimonials] = useState(false);
   const [showThankYou, setShowThankYou] = useState(false);
   const topRef = useRef<HTMLDivElement>(null);
-  const [step, setStep] = useState(1);
 
   useEffect(() => {
     calculatePriceEstimate();
@@ -291,10 +290,6 @@ export function VideoQuoteCalculator() {
   };
 
   const isFormComplete = () => {
-    if (step < 5) {
-      return false;
-    }
-
     if (!formData.projectType || formData.selectedGoals.length === 0 || !formData.projectDetails) {
       return false;
     }
@@ -821,10 +816,6 @@ export function VideoQuoteCalculator() {
            formData.otherDeliverables.some(d => d.type && d.duration);
   };
 
-  const handleNext = () => {
-    setStep(prevStep => prevStep + 1);
-  };
-
   const sendToZapier = async (data: FormDataType) => {
     try {
       const zapierData = {
@@ -847,15 +838,6 @@ export function VideoQuoteCalculator() {
     }
   }
 
-  const shouldShowNextBtn = () => {
-    return (step === 1 && formData.projectType) ||
-            (step === 2 && formData.selectedGoals.length !== 0) ||
-            (step === 3 && formData.projectType === 'event-video' && (formData.eventDays && formData.eventCity && formData.projectDetails)) ||
-            (step === 3 && formData.projectType !== 'event-video' && (formData.eventDays && formData.projectDetails)) ||
-            (step === 4 && formData.projectType === 'event-video' && formData.eventDeliverables.length !== 0) ||
-            (step === 4 && formData.projectType !== 'event-video' && !formData.otherDeliverables.some(d => !d.duration || !d.type));
-  }
-
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <Card className="max-w-4xl mx-auto">
@@ -869,23 +851,11 @@ export function VideoQuoteCalculator() {
             <>
               <div className="space-y-8">
                 {renderProjectTypeSelection()}
-                {(step >= 2 && formData.projectType) && renderGoalSelection()}
-                {(step >= 3 && formData.selectedGoals.length > 0) && renderProjectDetails()}
-                {(step >= 4 && formData.projectDetails) && renderDeliverables()}
-                {(step >= 5 && (formData.eventDeliverables.length > 0 || formData.otherDeliverables.some(d => d.type && d.duration))) && renderAddOns()}
-                {(step >= 5 && shouldShowPreProduction()) && renderPreProductionServices()}
-                {(!isFormComplete() && shouldShowNextBtn()) && (
-                  <>
-                    <div className="flex justify-between mt-8">
-                      <Button 
-                          onClick={handleNext}
-                          className="bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-300 ml-auto"
-                        >
-                          Next <ChevronRight className="ml-2 h-4 w-4" />
-                        </Button>
-                    </div>
-                  </>
-                )}
+                {formData.projectType && renderGoalSelection()}
+                {formData.selectedGoals.length > 0 && renderProjectDetails()}
+                {formData.projectDetails && renderDeliverables()}
+                {(formData.eventDeliverables.length > 0 || formData.otherDeliverables.some(d => d.type && d.duration)) && renderAddOns()}
+                {shouldShowPreProduction() && renderPreProductionServices()}
                 {isFormComplete() && (
                   <Button onClick={() => {
                     sendToZapier(formData);
