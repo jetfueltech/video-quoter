@@ -317,8 +317,8 @@ export function VideoQuoteCalculator() {
             className="h-auto py-4 flex flex-col items-center justify-center text-center"
             onClick={() => handleInputChange('projectType', type.value)}
           >
-            <span className="text-lg font-semibold">{type.label}</span>
-            <span className="text-sm text-gray-500 mt-1 px-2">{getProjectTypeDescription(type.value)}</span>
+            <span className="text-lg font-semibold w-full whitespace-normal">{type.label}</span>
+            <span className="block text-sm text-gray-500 mt-1 px-2 w-full whitespace-normal">{getProjectTypeDescription(type.value)}</span>
           </Button>
         ))}
       </div>
@@ -847,6 +847,15 @@ export function VideoQuoteCalculator() {
     }
   }
 
+  const shouldShowNextBtn = () => {
+    return (step === 1 && formData.projectType) ||
+            (step === 2 && formData.selectedGoals.length !== 0) ||
+            (step === 3 && formData.projectType === 'event-video' && (formData.eventDays && formData.eventCity && formData.projectDetails)) ||
+            (step === 3 && formData.projectType !== 'event-video' && (formData.eventDays && formData.projectDetails)) ||
+            (step === 4 && formData.projectType === 'event-video' && formData.eventDeliverables.length !== 0) ||
+            (step === 4 && formData.projectType !== 'event-video' && !formData.otherDeliverables.some(d => !d.duration || !d.type));
+  }
+
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <Card className="max-w-4xl mx-auto">
@@ -865,19 +874,11 @@ export function VideoQuoteCalculator() {
                 {(step >= 4 && formData.projectDetails) && renderDeliverables()}
                 {(step >= 5 && (formData.eventDeliverables.length > 0 || formData.otherDeliverables.some(d => d.type && d.duration))) && renderAddOns()}
                 {(step >= 5 && shouldShowPreProduction()) && renderPreProductionServices()}
-                {!isFormComplete() && (
+                {(!isFormComplete() && shouldShowNextBtn()) && (
                   <>
                     <div className="flex justify-between mt-8">
                       <Button 
                           onClick={handleNext}
-                          disabled={
-                            (step === 1 && !formData.projectType) ||
-                            (step === 2 && formData.selectedGoals.length === 0) ||
-                            (step === 3 && formData.projectType === 'event-video' && (!formData.eventDays || !formData.eventCity || !formData.projectDetails)) ||
-                            (step === 3 && formData.projectType !== 'event-video' && (!formData.eventDays || !formData.projectDetails)) ||
-                            (step === 4 && formData.projectType === 'event-video' && formData.eventDeliverables.length === 0) ||
-                            (step === 4 && formData.projectType !== 'event-video' && formData.otherDeliverables.some(d => !d.duration || !d.type))
-                          }
                           className="bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-300 ml-auto"
                         >
                           Next <ChevronRight className="ml-2 h-4 w-4" />
