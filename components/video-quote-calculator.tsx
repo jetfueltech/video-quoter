@@ -286,32 +286,7 @@ export function VideoQuoteCalculator() {
   };
 
   const scrollToTop = () => {
-    if (topRef.current) {
-      const scrollOptions = {
-        top: topRef.current.offsetTop,
-        behavior: 'smooth' as ScrollBehavior
-      };
-
-      if ('scrollTo' in window) {
-        window.scrollTo(scrollOptions);
-      } else {
-        // Fallback for older browsers
-        const scrollToTop = (element: Element, to: number, duration: number) => {
-          if (duration <= 0) return;
-          const difference = to - element.scrollTop;
-          const perTick = difference / duration * 10;
-
-          setTimeout(() => {
-            element.scrollTop = element.scrollTop + perTick;
-            if (element.scrollTop === to) return;
-            scrollToTop(element, to, duration - 10);
-          }, 10);
-        };
-
-        const scrollingElement = document.scrollingElement || document.documentElement;
-        scrollToTop(scrollingElement, topRef.current.offsetTop, 600);
-      }
-    }
+    globalThis.scrollTo({ top: 0, left: 0, behavior: "smooth" });
   };
 
   const isFormComplete = () => {
