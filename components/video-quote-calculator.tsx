@@ -10,7 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { Film, Clock, Clapperboard, Users, Camera, CheckCircle2, MapPin, AlertCircle, Star, Quote, ChevronDown, ChevronUp } from 'lucide-react';
+import {  X, Film, Clock, Clapperboard, Users, Camera, CheckCircle2, MapPin, AlertCircle, Star, Quote, ChevronDown, ChevronUp } from 'lucide-react';
 
 const ZAPIER_WEBHOOK_URL = '/api/sendtozapier'
 
@@ -303,6 +303,13 @@ export function VideoQuoteCalculator() {
     }
   };
 
+  const handleDeliverableClose = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      otherDeliverables: prev.otherDeliverables.filter((_, i) => i !== index)
+    }));
+  }
+
   const renderProjectTypeSelection = () => (
     <div className="space-y-6">
       <h2 className="text-2xl font-semibold text-gray-800">Select Your Project Type</h2>
@@ -476,6 +483,7 @@ export function VideoQuoteCalculator() {
                       ))}
                     </SelectContent>
                   </Select>
+                  <X onClick={() => handleDeliverableClose(index)} className="text-red-500" />
                 </div>
               </div>
             </Card>
