@@ -278,10 +278,10 @@ export function VideoQuoteCalculator() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Implement Zapier webhook submission here
+    scrollToTop();
     setShowThankYou(true);
     setShowSummary(false);
     setShowQuoteForm(false);
-    scrollToTop();
     sendToZapier(formData);
   };
 
@@ -862,9 +862,9 @@ export function VideoQuoteCalculator() {
                 {shouldShowPreProduction() && renderPreProductionServices()}
                 {isFormComplete() && (
                   <Button onClick={() => {
+                    scrollToTop();
                     sendToZapier(formData);
                     setShowSummary(true);
-                    scrollToTop();
                   }} className="w-full">Generate Quote</Button>
                 )}
               </div>
