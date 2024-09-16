@@ -286,7 +286,11 @@ export function VideoQuoteCalculator() {
   };
 
   const scrollToTop = () => {
-    globalThis.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+    // globalThis.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+    const titleElement = document.getElementById("title");
+    if (titleElement) {
+      titleElement.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
   const isFormComplete = () => {
@@ -843,7 +847,7 @@ export function VideoQuoteCalculator() {
       <Card className="max-w-4xl mx-auto">
         <CardContent className="p-6">
           <div ref={topRef} className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">Video Quote Calculator</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-4" id="title">Video Quote Calculator</h1>
           </div>
           {showThankYou ? (
             renderThankYou()
