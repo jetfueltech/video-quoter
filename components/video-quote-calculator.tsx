@@ -292,6 +292,10 @@ export function VideoQuoteCalculator() {
           top: topRef.current.offsetTop,
           behavior: 'smooth'
         });
+      } else if ('scrollTop' in document.documentElement) {
+        document.documentElement.scrollTop = topRef.current.offsetTop;
+      } else if ('scrollTop' in document.body) {
+        document.body.scrollTop = topRef.current.offsetTop;
       } else {
         (window as Window).scrollTo(0, topRef.current.offsetTop);
       }
