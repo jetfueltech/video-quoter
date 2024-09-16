@@ -286,7 +286,16 @@ export function VideoQuoteCalculator() {
   };
 
   const scrollToTop = () => {
-    topRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (topRef.current) {
+      if ('scrollTo' in window) {
+        window.scrollTo({
+          top: topRef.current.offsetTop,
+          behavior: 'smooth'
+        });
+      } else {
+        (window as Window).scrollTo(0, topRef.current.offsetTop);
+      }
+    }
   };
 
   const isFormComplete = () => {
