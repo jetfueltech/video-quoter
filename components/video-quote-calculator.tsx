@@ -863,8 +863,8 @@ export function VideoQuoteCalculator() {
                 {isFormComplete() && (
                   <Button onClick={() => {
                     scrollToTop();
-                    sendToZapier(formData);
-                    setShowSummary(true);
+                    // sendToZapier(formData);
+                    // setShowSummary(true);
                   }} className="w-full">Generate Quote</Button>
                 )}
               </div>
