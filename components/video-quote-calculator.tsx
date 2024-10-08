@@ -10,7 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import {  X, Film, Clock, Clapperboard, Users, Camera, CheckCircle2, MapPin, AlertCircle, Star, Quote, ChevronDown, ChevronUp } from 'lucide-react';
+import { X, Film, Clock, Clapperboard, Users, Camera, CheckCircle2, MapPin, AlertCircle, Star, Quote, ChevronDown, ChevronUp } from 'lucide-react';
 
 const ZAPIER_WEBHOOK_URL = '/api/sendtozapier'
 
@@ -164,9 +164,9 @@ export function VideoQuoteCalculator() {
   });
   const [priceEstimate, setPriceEstimate] = useState(0);
   const [showSummary, setShowSummary] = useState(false);
-  const [showQuoteForm, setShowQuoteForm] = useState(false);
   const [expandedTestimonials, setExpandedTestimonials] = useState(false);
   const [showThankYou, setShowThankYou] = useState(false);
+  const [email, setEmail] = useState('');
   const topRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -267,28 +267,25 @@ export function VideoQuoteCalculator() {
     });
   };
 
-  const handleQuoteRequestChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      quoteRequest: { ...prev.quoteRequest, [name]: value }
-    }));
-  };
+  const handleSubmit = async () => {
+    const submissionData = {
+      ...formData,
+      email,
+      priceEstimate
+    };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    // Implement Zapier webhook submission here
-    scrollToTop();
-    setShowThankYou(true);
-    setShowSummary(false);
-    setShowQuoteForm(false);
-    sendToZapier(formData);
+    try {
+      await sendToZapier(submissionData);
+      setShowThankYou(true);
+      setShowSummary(false);
+    } catch (error) {
+      console.error('Error sending data to Zapier:', error);
+      // Handle error (e.g., show error message to user)
+    }
   };
 
   const scrollToTop = () => {
-    setTimeout(() => {
-      globalThis.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-    }, 500);
+    topRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const isFormComplete = () => {
@@ -344,10 +341,11 @@ export function VideoQuoteCalculator() {
             <Checkbox
               id={goal}
               checked={formData.selectedGoals.includes(goal)}
-              onCheckedChange={() => handleGoalChange(goal)}
+              onCheckedChange={() => 
+              handleGoalChange(goal)}
             />
             <div className="flex-grow">
-              <Label htmlFor={goal} className="font-medium">{goal}</Label>
+              <Label htmlFor={goal}>{goal}</Label>
             </div>
           </div>
         ))}
@@ -362,7 +360,7 @@ export function VideoQuoteCalculator() {
         {formData.projectType === 'event-video' ? (
           <>
             <div>
-              <Label htmlFor="eventDays" className="block mb-2">Number of days to be filmed</Label>
+              <Label htmlFor="eventDays">Number of days to be filmed</Label>
               <Input
                 id="eventDays"
                 type="number"
@@ -373,7 +371,7 @@ export function VideoQuoteCalculator() {
               />
             </div>
             <div>
-              <Label htmlFor="eventCity" className="block mb-2">Event City</Label>
+              <Label htmlFor="eventCity">Event City</Label>
               <Input
                 id="eventCity"
                 type="text"
@@ -386,12 +384,14 @@ export function VideoQuoteCalculator() {
           </>
         ) : (
           <div>
-            <Label htmlFor="productionHours" className="block mb-2">Production Hours</Label>
+            <Label htmlFor="productionHours">Production Hours</Label>
             <Select 
               value={formData.productionHours.toString()} 
               onValueChange={(value) => handleInputChange('productionHours', value === 'not-sure' ? 'not-sure' : parseInt(value))}
             >
-              <SelectTrigger id="productionHours"><SelectValue placeholder="Select hours" /></SelectTrigger>
+              <SelectTrigger id="productionHours">
+                <SelectValue placeholder="Select hours" />
+              </SelectTrigger>
               <SelectContent>
                 {Object.keys(productionRates.video).map(hours => (
                   <SelectItem key={hours} value={hours}>{hours} hours</SelectItem>
@@ -402,9 +402,11 @@ export function VideoQuoteCalculator() {
           </div>
         )}
         <div>
-          <Label htmlFor="productionType" className="block mb-2">Production Type</Label>
+          <Label htmlFor="productionType">Production Type</Label>
           <Select value={formData.productionType} onValueChange={(value) => handleInputChange('productionType', value as 'video' | 'photo' | 'photoVideo')}>
-            <SelectTrigger id="productionType"><SelectValue placeholder="Select type" /></SelectTrigger>
+            <SelectTrigger id="productionType">
+              <SelectValue placeholder="Select type" />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="video">Video</SelectItem>
               <SelectItem value="photo">Photo</SelectItem>
@@ -446,7 +448,7 @@ export function VideoQuoteCalculator() {
                   onCheckedChange={() => handleDeliverableChange(deliverable)}
                 />
                 <div className="flex-grow">
-                  <Label htmlFor={deliverable} className="font-medium">{deliverable}</Label>
+                  <Label htmlFor={deliverable}>{deliverable}</Label>
                 </div>
               </div>
             ))}
@@ -463,7 +465,9 @@ export function VideoQuoteCalculator() {
                     <Film className="w-6 h-6 text-gray-500" />
                   </div>
                   <Select value={deliverable.type} onValueChange={(v) => handleOtherDeliverableChange(index, 'type', v)}>
-                    <SelectTrigger className="w-full sm:w-[200px]"><SelectValue placeholder="What type of video?" /></SelectTrigger>
+                    <SelectTrigger className="w-full sm:w-[200px]">
+                      <SelectValue placeholder="What type of video?" />
+                    </SelectTrigger>
                     <SelectContent>
                       {deliverableTypes[formData.projectType]?.map(type => (
                         <SelectItem key={type} value={type}>{type}</SelectItem>
@@ -476,14 +480,16 @@ export function VideoQuoteCalculator() {
                     <Clock className="w-6 h-6 text-gray-500" />
                   </div>
                   <Select value={deliverable.duration} onValueChange={(v) => handleOtherDeliverableChange(index, 'duration', v)}>
-                    <SelectTrigger className="w-full sm:w-[140px]"><SelectValue placeholder="How long?" /></SelectTrigger>
+                    <SelectTrigger className="w-full sm:w-[140px]">
+                      <SelectValue placeholder="How long?" />
+                    </SelectTrigger>
                     <SelectContent>
                       {Object.keys(videoEdits).map(duration => (
                         <SelectItem key={duration} value={duration}>{duration}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                  <X onClick={() => handleDeliverableClose(index)} className="text-red-500" />
+                  <X onClick={() => handleDeliverableClose(index)} className="text-red-500 cursor-pointer" />
                 </div>
               </div>
             </Card>
@@ -512,7 +518,7 @@ export function VideoQuoteCalculator() {
             onCheckedChange={() => handleAddOnChange('None')}
           />
           <div className="flex-grow">
-            <Label htmlFor="None" className="font-medium">None</Label>
+            <Label htmlFor="None">None</Label>
           </div>
         </div>
         {Object.keys(addOns).map((addOn: string) => (
@@ -529,7 +535,7 @@ export function VideoQuoteCalculator() {
               onCheckedChange={() => handleAddOnChange(addOn)}
             />
             <div className="flex-grow">
-              <Label htmlFor={addOn} className="font-medium">{addOn}</Label>
+              <Label htmlFor={addOn}>{addOn}</Label>
             </div>
           </div>
         ))}
@@ -553,7 +559,7 @@ export function VideoQuoteCalculator() {
             onCheckedChange={() => handlePreProductionServiceChange('None')}
           />
           <div className="flex-grow">
-            <Label htmlFor="NonePreProduction" className="font-medium">None</Label>
+            <Label htmlFor="NonePreProduction">None</Label>
           </div>
         </div>
         {Object.keys(preProductionServices).map((service: string) => (
@@ -570,7 +576,7 @@ export function VideoQuoteCalculator() {
               onCheckedChange={() => handlePreProductionServiceChange(service)}
             />
             <div className="flex-grow">
-              <Label htmlFor={service} className="font-medium">{service}</Label>
+              <Label htmlFor={service}>{service}</Label>
             </div>
           </div>
         ))}
@@ -677,67 +683,26 @@ export function VideoQuoteCalculator() {
           </div>
         </div>
       </Card>
-      <Button onClick={() => setShowQuoteForm(true)} className="w-full">Confirm Quote</Button>
-    </div>
-  );
-
-  const renderQuoteForm = () => (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-semibold text-gray-800">Confirm Your Quote</h2>
-      <p className="text-gray-600">Please fill out your information below to confirm your project quote.</p>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <Label htmlFor="name">Name</Label>
-          <Input
-            id="name"
-            name="name"
-            value={formData.quoteRequest.name}
-            onChange={handleQuoteRequestChange}
-            required
-          />
-        </div>
-        <div>
+      <div className="relative flex flex-col items-center justify-center overflow-hidden rounded-lg border bg-background p-6 md:shadow-xl">
+        <h3 className="text-xl font-semibold text-gray-800 mb-2 text-center">Special Offer</h3>
+        <p className="text-gray-600 mb-4 text-center">
+          Enter your email, save your quote and get up to 20% off your video project. (offer only valid now)
+        </p>
+        <div className="space-y-2 w-full max-w-md">
           <Label htmlFor="email">Email</Label>
           <Input
             id="email"
-            name="email"
             type="email"
-            value={formData.quoteRequest.email}
-            onChange={handleQuoteRequestChange}
-            required
+            placeholder="Enter your email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full"
           />
         </div>
-        <div>
-          <Label htmlFor="phone">Phone (optional)</Label>
-          <Input
-            id="phone"
-            name="phone"
-            type="tel"
-            value={formData.quoteRequest.phone}
-            onChange={handleQuoteRequestChange}
-          />
-        </div>
-        <div>
-          <Label htmlFor="company">Company</Label>
-          <Input
-            id="company"
-            name="company"
-            value={formData.quoteRequest.company}
-            onChange={handleQuoteRequestChange}
-          />
-        </div>
-        <div>
-          <Label htmlFor="additionalInfo">Additional Information</Label>
-          <Textarea
-            id="additionalInfo"
-            name="additionalInfo"
-            value={formData.quoteRequest.additionalInfo}
-            onChange={handleQuoteRequestChange}
-            rows={4}
-          />
-        </div>
-        <Button type="submit" className="w-full">Confirm Quote</Button>
-      </form>
+        <Button onClick={handleSubmit} className="w-full max-w-md mt-4">
+          Get Special Offer
+        </Button>
+      </div>
     </div>
   );
 
@@ -813,6 +778,9 @@ export function VideoQuoteCalculator() {
           preProductionServices: [],
           quoteRequest: { name: '', email: '', phone: '', company: '', additionalInfo: '' }
         });
+        setEmail('');
+        setPriceEstimate(0);
+        setShowSummary(false);
       }} className="mt-4">
         Start New Quote
       </Button>
@@ -826,16 +794,11 @@ export function VideoQuoteCalculator() {
            formData.otherDeliverables.some(d => d.type && d.duration);
   };
 
-  const sendToZapier = async (data: FormDataType) => {
+  const sendToZapier = async (data: FormDataType & { email: string, priceEstimate: number }) => {
     try {
-      const zapierData = {
-        ...data,
-        priceEstimate
-      }
-      console.log('zapierData submitted:', zapierData);
       const response = await fetch(ZAPIER_WEBHOOK_URL, {
         method: 'POST',
-        body: JSON.stringify(zapierData),
+        body: JSON.stringify(data),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -845,6 +808,7 @@ export function VideoQuoteCalculator() {
       }
     } catch (error) {
       console.error('Error sending data to Zapier:', error)
+      throw error
     }
   }
 
@@ -869,18 +833,13 @@ export function VideoQuoteCalculator() {
                 {isFormComplete() && (
                   <Button onClick={() => {
                     scrollToTop();
-                    sendToZapier(formData);
                     setShowSummary(true);
                   }} className="w-full">Generate Quote</Button>
                 )}
               </div>
-              
             </>
           ) : (
-            <div className="space-y-6">
-              {renderSummary()}
-              {showQuoteForm && renderQuoteForm()}
-            </div>
+            renderSummary()
           )}
           {renderTestimonialsAndAbout()}
         </CardContent>
@@ -888,5 +847,3 @@ export function VideoQuoteCalculator() {
     </div>
   );
 }
-
-//app
